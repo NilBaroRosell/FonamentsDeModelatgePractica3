@@ -27,11 +27,18 @@ public class MovingTarget: MonoBehaviour
 
     Vector3 _dir;
 
-   
-    
+    private Vector3 initPosition;
+
+    public float horizontalInput;
+
+    public float verticalInput;
 
     //variable added just to control whether we are 
-   
+
+    private void Awake()
+    {
+        initPosition = transform.position;
+    }
 
     // Start is called before the first frame update
     void Start()
@@ -63,15 +70,8 @@ public class MovingTarget: MonoBehaviour
 
         if (_mode == MovingMode.USERTARGET)
         {
-            //get the Input from Horizontal axis
-            float horizontalInput = Input.GetAxis("Horizontal");
-            //get the Input from Vertical axis
-            float verticalInput = Input.GetAxis("Vertical");
-
             //update the position
-            transform.position = transform.position + new Vector3(-horizontalInput * _movementSpeed * Time.deltaTime, verticalInput * _movementSpeed * Time.deltaTime, 0);
-
-       
+            transform.position = transform.position + new Vector3(-horizontalInput * _movementSpeed * Time.deltaTime, verticalInput * _movementSpeed * Time.deltaTime, 0);      
         }
         else if (_mode == MovingMode.RANDOM) {
 
@@ -109,12 +109,36 @@ public class MovingTarget: MonoBehaviour
     //        //Debug.Log("I cannot change direction: " + transform.position + " " + _xMax + " " + _xMin + " " + _yMax + " " + _yMin);
     //        yield return new WaitForSeconds(0.1f);
     //    }
-       
-       
+
+
 
     //}
 
-    private void OnCollisionEnter(Collision collision)
+    public void Restart()
+    {
+        transform.position = initPosition;
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (_mode == MovingMode.USERTARGET)
+            _myOctopus.NotifyTarget(transform, other.gameObject.transform);
+    }
+
+    private void OnTriggerStay(Collider other)
+    {
+        if (_mode == MovingMode.USERTARGET)
+            _myOctopus.NotifyTarget(transform, other.gameObject.transform);
+        else if (_mode == MovingMode.RANDOM)
+        {
+
+
+
+        }
+
+    }
+
+    /*private void OnCollisionEnter(Collision collision)
     {
         if(_mode == MovingMode.USERTARGET)
             _myOctopus.NotifyTarget(transform, collision.collider.transform);
@@ -134,7 +158,7 @@ public class MovingTarget: MonoBehaviour
 
         }
         //Debug.Log("I am object " + name + "  and i stay colliding with " + collision.collider.name);
-    }
+    }*/
     //private void OnCollisionExit(Collision collision)
     //{
     //    if(_mode == MovingMode.RANDOM) { 

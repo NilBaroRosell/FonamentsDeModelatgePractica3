@@ -12,7 +12,8 @@ public class IK_Scorpion : MonoBehaviour
     [Header("Body")]
     float animTime;
     public float animDuration = 5;
-    bool animPlaying = false;
+    [HideInInspector]
+    public bool animPlaying = false;
     public Transform Body;
     public Transform StartPos;
     public Transform EndPos;
@@ -25,6 +26,13 @@ public class IK_Scorpion : MonoBehaviour
     public Transform[] legs;
     public Transform[] legTargets;
     public Transform[] futureLegBases;
+
+    private Transform initTransform;
+
+    private void Awake()
+    {
+        initTransform = gameObject.transform;
+    }
 
     // Start is called before the first frame update
     void Start()
@@ -43,7 +51,7 @@ public class IK_Scorpion : MonoBehaviour
 
         
         
-        if (Input.GetKeyDown(KeyCode.Space))
+        if (Input.GetKeyUp(KeyCode.Space))
         {
             NotifyStartWalk();
             animTime = 0;
@@ -74,5 +82,13 @@ public class IK_Scorpion : MonoBehaviour
     {
 
         _myController.NotifyStartWalk();
+    }
+
+    public void Restart()
+    {
+        Body.position = StartPos.position;
+        _myController.GoInitialPosition();
+        animTime = 0;
+        animPlaying = false;
     }
 }

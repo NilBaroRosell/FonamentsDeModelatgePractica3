@@ -35,13 +35,14 @@ public class IK_tentacles : MonoBehaviour
     [SerializeField]
     bool _updateTwistSwingLimits = false;
 
-
+    private bool _missSave = false;
 
 
     [SerializeField]
     float TwistMin{set{ _myController.TwistMin = value; }}
 
 
+    private Transform initTransform;
 
     #region public methods
 
@@ -49,17 +50,24 @@ public class IK_tentacles : MonoBehaviour
     public void NotifyTarget(Transform target, Transform region)
     {
         _myController.NotifyTarget(target, region);
-
     }
 
     public void NotifyShoot()
     {
-        _myController.NotifyShoot();
+        if (!_missSave)
+        {
+            _myController.NotifyShoot();
+        }
+
+        _missSave = !_missSave;
     }
 
 
     #endregion
-
+    private void Awake()
+    {
+        initTransform = gameObject.transform;
+    }
 
     // Start is called before the first frame update
     void Start()
@@ -74,8 +82,6 @@ public class IK_tentacles : MonoBehaviour
         _myController.SwingMin = _swingMin;
 
     }
-
-
 
     // Update is called once per frame
     void Update()
