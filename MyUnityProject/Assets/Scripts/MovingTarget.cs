@@ -29,10 +29,16 @@ public class MovingTarget: MonoBehaviour
 
     private Vector3 initPosition;
 
+    [HideInInspector]
     public float horizontalInput;
 
+    [HideInInspector]
     public float verticalInput;
 
+    [HideInInspector]
+    public bool move = true;
+
+    public float effect;
     //variable added just to control whether we are 
 
     private void Awake()
@@ -60,6 +66,8 @@ public class MovingTarget: MonoBehaviour
 
 
         }
+
+        effect = 0;
     }
 
 
@@ -71,11 +79,15 @@ public class MovingTarget: MonoBehaviour
         if (_mode == MovingMode.USERTARGET)
         {
             //update the position
-            transform.position = transform.position + new Vector3(-horizontalInput * _movementSpeed * Time.deltaTime, verticalInput * _movementSpeed * Time.deltaTime, 0);      
+            if(move) transform.position = transform.position + new Vector3(-horizontalInput * _movementSpeed * Time.deltaTime, verticalInput * _movementSpeed * Time.deltaTime, 0);
+            if (Input.GetKeyUp(KeyCode.Space))
+            {
+                _myOctopus.NotifyShoot();
+
+            }
         }
         else if (_mode == MovingMode.RANDOM) {
 
-            //transform.position += _dir * _movementSpeed;
 
             Vector3 pos = new Vector3(_region.transform.position.x + 0.4f* _region.transform.localScale.z * Mathf.Cos(2.0f * Mathf.PI * _movementSpeed * Time.time), //localScale is Z due to a local/global axis disalignment
                                       _region.transform.position.y + 0.4f *  _region.transform.localScale.y * Mathf.Sin(2.0f * Mathf.PI * _movementSpeed * Time.time), transform.position.z);
@@ -84,7 +96,6 @@ public class MovingTarget: MonoBehaviour
             transform.position = pos;
 
 
-          //  StartCoroutine(ChangeDir());
 
         } 
 
@@ -93,30 +104,11 @@ public class MovingTarget: MonoBehaviour
 
     }
 
-    //IEnumerator ChangeDir()
-    //{
-    //        //we add a minimum distance because sometimes when the direction change is too near from the border, changing dear makes the ball get lost
-    //       float wallDistance = 0.05f;
-
-
-    //    if ((transform.position.x + wallDistance < _xMax) && (transform.position.x - wallDistance > _xMin) &&
-    //         (transform.position.y + wallDistance < _yMax) && (transform.position.y - wallDistance > _yMin))
-    //    {
-    //        _dir = getNewDirection(_dir);
-    //        yield return new WaitForSeconds(2);
-    //    }
-    //    else {
-    //        //Debug.Log("I cannot change direction: " + transform.position + " " + _xMax + " " + _xMin + " " + _yMax + " " + _yMin);
-    //        yield return new WaitForSeconds(0.1f);
-    //    }
-
-
-
-    //}
-
     public void Restart()
     {
         transform.position = initPosition;
+        move = true;
+        effect = 0;
     }
 
     private void OnTriggerEnter(Collider other)

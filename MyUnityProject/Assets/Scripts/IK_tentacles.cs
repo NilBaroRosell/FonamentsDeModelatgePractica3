@@ -62,6 +62,11 @@ public class IK_tentacles : MonoBehaviour
         _missSave = !_missSave;
     }
 
+    public void NotifyEndShoot()
+    {
+        _myController.NotifyEndShoot();
+    }
+
 
     #endregion
     private void Awake()
