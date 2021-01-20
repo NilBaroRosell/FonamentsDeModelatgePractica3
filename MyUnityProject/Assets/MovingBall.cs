@@ -25,32 +25,39 @@ public class MovingBall : MonoBehaviour
     private Vector3 velocity;
 
     public Vector3 magnusForce;
-    private Vector3 magnusDirection;
-    private Vector3 effectDirection;
+    [HideInInspector]
+    public Vector3 magnusDirection;
+    [HideInInspector]
+    public Vector3 effectDirection;
+    [HideInInspector]
     public Vector3 impactPoint;
     private Vector3 finalForce;
 
     private Vector3 initPos;
 
     private GameObject positionsBlue;
-    private GameObject arrowGreen;
-    private GameObject arrowRed;
+    [HideInInspector]
+    public GameObject arrowGreen;
+    [HideInInspector]
+    public GameObject arrowRed;
 
     public Transform arrow;
 
     private Vector3 arrowInitialForward;
 
     float mass = 0.5f;
-
-    private bool showInfo = false;
-
-    public bool ajustShot = true;
+    [HideInInspector]
+    public bool showInfo = false;
+    [HideInInspector]
+    public bool adjustShot = true;
 
     private float startTime;
 
     private bool stopped;
-
+    [HideInInspector]
     public bool goal;
+    [HideInInspector]
+    public bool showTrajectory;
 
     [SerializeField]
     private Text rotationVelocityText;
@@ -90,7 +97,7 @@ public class MovingBall : MonoBehaviour
             }
         }
 
-        if (!goal && (transform.position.z < -71 && transform.position.z < -71.5f) && (transform.position.x < -109 && transform.position.x > -149) && transform.position.y < 24)
+        if (!goal && (transform.position.z < -71 && transform.position.z < -71.5f) && (transform.position.x < -108 && transform.position.x > -150) && transform.position.y < 24)
         {
             Debug.Log("GOOOAL!!");
             goal = true;
@@ -99,18 +106,10 @@ public class MovingBall : MonoBehaviour
         CalculateNewRotation();
     }
 
-    public void SetShotForce(float _force, Vector3 _direction)
+    public void SetShot()
     {
-        force = _force;
-        direction = _direction.normalized;
-        if (showInfo)
-        {
-            arrowGreen.SetActive(true);
-            arrowGreen.transform.forward = magnusDirection;
-            arrowRed.SetActive(true);
-            arrowRed.transform.forward = effectDirection;
-        }
-        ajustShot = false;
+        direction = arrow.forward;
+        adjustShot = false;
     }
 
     public void SetShotDirection()
@@ -118,7 +117,8 @@ public class MovingBall : MonoBehaviour
         impact = false;
         positionsBlue.SetActive(true);
         arrowGreen.SetActive(false);
-        arrowRed.SetActive(false);
+        arrowRed.SetActive(false);        
+        showTrajectory = false;        
     }
 
     public void Restart()
@@ -129,7 +129,7 @@ public class MovingBall : MonoBehaviour
         positionsBlue.SetActive(false);
         arrowGreen.SetActive(false);
         arrowRed.SetActive(false);
-        ajustShot = true;
+        adjustShot = true;
         arrow.forward = arrowInitialForward;
         startTime = -1;
         stopped = false;
@@ -149,6 +149,24 @@ public class MovingBall : MonoBehaviour
         float x = initPos.x + velocity.x * deltaTime + 0.5f * finalForce.x * deltaTime * deltaTime;
         float y = initPos.y + velocity.y * deltaTime + 0.5f * finalForce.y * deltaTime * deltaTime;
         float z = initPos.z + velocity.z * deltaTime + 0.5f * finalForce.z * deltaTime * deltaTime;
+
+        return new Vector3(x, y, z);
+    }
+    private Vector3 GetNewRenderPos(float t)
+    {
+        float x = initPos.x + velocity.x * t + 0.5f * finalForce.x * t * t;
+        float y = initPos.y + velocity.y * t + 0.5f * finalForce.y * t * t;
+        float z = initPos.z + velocity.z * t + 0.5f * finalForce.z * t * t;
+
+        return new Vector3(x, y, z);
+    }
+    private Vector3 GetNewRenderOriginalPos(float t)
+    {
+        Vector3 newVel = arrow.forward * force * 3;
+
+        float x = initPos.x + newVel.x * t;
+        float y = initPos.y + newVel.y * t;
+        float z = initPos.z + newVel.z * t;
 
         return new Vector3(x, y, z);
     }
@@ -189,6 +207,25 @@ public class MovingBall : MonoBehaviour
         rotationVelocityText.text = rotationVelocity.ToString("F1") + " deg/sec";
 
         finalForce = -Vector3.right * rotationVelocity;
+    }
+
+    void OnDrawGizmosSelected()
+    {
+        if (showTrajectory)
+        {
+            CalculateNewRotation();
+            velocity = magnusDirection * force;
+
+            float t = 0;
+            for (int i = 0; i < 30; i++)
+            {
+                Gizmos.color = Color.blue;
+                Gizmos.DrawSphere(GetNewRenderPos(t), 0.25f);
+                Gizmos.color = Color.gray;
+                Gizmos.DrawSphere(GetNewRenderOriginalPos(t), 0.25f);
+                t += 0.1f;
+            }
+        }
     }
 
     private void OnCollisionEnter(Collision collision)

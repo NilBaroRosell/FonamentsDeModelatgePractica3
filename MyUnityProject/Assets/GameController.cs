@@ -54,7 +54,7 @@ public class GameController : MonoBehaviour
             textMagnus.text = "EFFECT FORCE: " + effectForce;
         }
 
-        if (ball.ajustShot)
+        if (ball.adjustShot)
         {
             movingTarget.verticalInput = Input.GetAxis("Vertical");
             movingTarget.horizontalInput = Input.GetAxis("Horizontal");
@@ -65,6 +65,12 @@ public class GameController : MonoBehaviour
             {
                 spaceBarForce = 0;
                 increase = true;
+                if (ball.showInfo)
+                {
+                    ball.arrowGreen.SetActive(true);
+                    ball.arrowRed.SetActive(true);
+                    ball.showTrajectory = true;
+                }
             }
             else if (Input.GetButton("Shot"))
             {
@@ -89,18 +95,15 @@ public class GameController : MonoBehaviour
 
                 slider.value = spaceBarForce / 100;
                 text.text = "FORCE: " + (int)spaceBarForce;
+
+                ball.force = slider.value * 5;
+                ball.arrowGreen.transform.forward = ball.magnusDirection;
+                ball.arrowRed.transform.forward = ball.effectDirection;
             }
             else if (Input.GetButtonUp("Shot"))
             {
                 movingTarget.move = false;
-                if(slider.value < 0.5f)
-                {
-                    ball.SetShotForce(0.5f * 5, movingTarget.transform.position - ball.transform.position);
-                }
-                else
-                {
-                    ball.SetShotForce(slider.value * 5, movingTarget.transform.position - ball.transform.position);
-                }
+                ball.SetShot();
             }
 
             if (Input.GetKey(KeyCode.X))
