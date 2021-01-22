@@ -101,7 +101,6 @@ public class GameController : MonoBehaviour
                 {
                     ball.arrowGreen.SetActive(true);
                     ball.arrowRed.SetActive(true);
-                    ball.showTrajectory = true;
                 }
             }
             else if (Input.GetButton("Shot"))
@@ -161,7 +160,8 @@ public class GameController : MonoBehaviour
                 float angle = Mathf.Acos(value);
                 float y = -Mathf.Sin(angle);
                 ball.magnusForce = new Vector3((sliderMagnus.value - 0.5f) * 2, 0, y).normalized;
-                ball.impactPoint = -ball.magnusForce * 0.25f;
+                Vector3 aux = new Vector3(ball.arrow.forward.x, ball.arrow.forward.y, 0);
+                ball.impactPoint = -aux * 0.25f - ball.magnusForce * 0.25f;
                 ball.transform.GetChild(3).transform.position = ball.transform.position + ball.impactPoint;
             }
         }
@@ -180,6 +180,10 @@ public class GameController : MonoBehaviour
             robot2.SetBool("Goal", true);
             robot3.SetBool("Goal", true);
             robot4.SetBool("Goal", true);
+            robot1.SetBool("Miss", false);
+            robot2.SetBool("Miss", false);
+            robot3.SetBool("Miss", false);
+            robot4.SetBool("Miss", false);
         }
         else if(ball.miss)
         {
@@ -187,6 +191,10 @@ public class GameController : MonoBehaviour
             robot2.SetBool("Miss", true);
             robot3.SetBool("Miss", true);
             robot4.SetBool("Miss", true);
+            robot1.SetBool("Goal", false);
+            robot2.SetBool("Goal", false);
+            robot3.SetBool("Goal", false);
+            robot4.SetBool("Goal", false);
         }
     }
 }

@@ -57,11 +57,13 @@ public class MovingBall : MonoBehaviour
     [HideInInspector]
     public bool goal;
     public bool miss;
-    [HideInInspector]
-    public bool showTrajectory;
-
     [SerializeField]
     private Text rotationVelocityText;
+    
+    [SerializeField]
+    private GameObject graySpherePrefab;
+    [SerializeField]
+    private GameObject blueSpherePrefab;
 
     private void Awake()
     {
@@ -77,6 +79,8 @@ public class MovingBall : MonoBehaviour
         stopped = false;
         goal = false;
         miss = false;
+        graySpherePrefab.SetActive(false);
+        blueSpherePrefab.SetActive(false);
     }
 
     // Start is called before the first frame update
@@ -99,18 +103,37 @@ public class MovingBall : MonoBehaviour
             }
         }
 
-        if (!goal && transform.position.z < -71 && (transform.position.x < -108 && transform.position.x > -150) && transform.position.y < 24)
+        if (!goal && transform.position.z < -71  && (transform.position.x < -107.75f && transform.position.x > -150.25f) && transform.position.y < 24)
         {
             Debug.Log("GOOOAL!!");
             goal = true;
         }
-        else if(!goal && !miss && transform.position.z < -71)
+        else if(!goal && !miss && ((transform.position.z < -73 || (transform.position.z > -73 && (transform.position.x > -100 || transform.position.x < -155))) || stopped))
         {
             Debug.Log("MIIISS!!");
             miss = true;
         }
 
         CalculateNewRotation();
+
+        if (showInfo && !goal && !miss)
+        {
+            velocity = magnusDirection * force;
+
+            float t = 0;
+            for (int i = 0; i < 30; i++)
+            {
+                GameObject aux = Instantiate(graySpherePrefab, GetNewRenderOriginalPos(t), graySpherePrefab.transform.rotation);
+                aux.SetActive(true);
+                aux.name += i;
+                StartCoroutine(DestroyGameObject(Time.deltaTime, aux));
+                GameObject aux2 = Instantiate(blueSpherePrefab, GetNewRenderPos(t), blueSpherePrefab.transform.rotation);
+                aux2.SetActive(true);
+                aux2.name += i;
+                StartCoroutine(DestroyGameObject(Time.deltaTime, aux2));
+                t += 0.1f;
+            }
+        }
     }
 
     public void SetShot()
@@ -125,7 +148,6 @@ public class MovingBall : MonoBehaviour
         positionsBlue.SetActive(true);
         arrowGreen.SetActive(false);
         arrowRed.SetActive(false);        
-        showTrajectory = false;        
     }
 
     public void Restart()
@@ -217,25 +239,6 @@ public class MovingBall : MonoBehaviour
         finalForce = -Vector3.right * rotationVelocity;
     }
 
-    void OnDrawGizmosSelected()
-    {
-        if (showTrajectory)
-        {
-            CalculateNewRotation();
-            velocity = magnusDirection * force;
-
-            float t = 0;
-            for (int i = 0; i < 30; i++)
-            {
-                Gizmos.color = Color.blue;
-                Gizmos.DrawSphere(GetNewRenderPos(t), 0.25f);
-                Gizmos.color = Color.gray;
-                Gizmos.DrawSphere(GetNewRenderOriginalPos(t), 0.25f);
-                t += 0.1f;
-            }
-        }
-    }
-
     private void OnCollisionEnter(Collision collision)
     {
         if (collision.gameObject.tag == "Octopus")
@@ -246,5 +249,12 @@ public class MovingBall : MonoBehaviour
         {
             impact = true;
         }
+    }
+
+    private IEnumerator DestroyGameObject(float waitTime, GameObject aux)
+    {
+        yield return new WaitForSeconds(waitTime);
+
+        Destroy(aux);
     }
 }
