@@ -56,6 +56,7 @@ public class MovingBall : MonoBehaviour
     private bool stopped;
     [HideInInspector]
     public bool goal;
+    public bool miss;
     [HideInInspector]
     public bool showTrajectory;
 
@@ -75,6 +76,7 @@ public class MovingBall : MonoBehaviour
         startTime = - 1;
         stopped = false;
         goal = false;
+        miss = false;
     }
 
     // Start is called before the first frame update
@@ -97,10 +99,15 @@ public class MovingBall : MonoBehaviour
             }
         }
 
-        if (!goal && (transform.position.z < -71 && transform.position.z < -71.5f) && (transform.position.x < -108 && transform.position.x > -150) && transform.position.y < 24)
+        if (!goal && transform.position.z < -71 && (transform.position.x < -108 && transform.position.x > -150) && transform.position.y < 24)
         {
             Debug.Log("GOOOAL!!");
             goal = true;
+        }
+        else if(!goal && !miss && transform.position.z < -71)
+        {
+            Debug.Log("MIIISS!!");
+            miss = true;
         }
 
         CalculateNewRotation();
@@ -135,6 +142,7 @@ public class MovingBall : MonoBehaviour
         stopped = false;
         _myOctopus.NotifyEndShoot();
         goal = false;
+        miss = false;
     }
 
     private Vector3 GetNewPos()

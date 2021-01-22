@@ -31,6 +31,9 @@ public class GameController : MonoBehaviour
     private float effectForce = 0;
 
     private bool increase = true;
+
+    [SerializeField]
+    private Animator robot1, robot2, robot3, robot4;
     
     // Start is called before the first frame update
     void Start()
@@ -41,6 +44,23 @@ public class GameController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if(robot1.GetBool("Restart"))
+        {
+            robot1.SetBool("Restart", false);
+        }
+        if(robot2.GetBool("Restart"))
+        {
+            robot2.SetBool("Restart", false);
+        }
+        if(robot3.GetBool("Restart"))
+        {
+            robot3.SetBool("Restart", false);
+        }
+        if(robot4.GetBool("Restart"))
+        {
+            robot4.SetBool("Restart", false);
+        }
+
         if (Input.GetButtonDown("Restart"))
         {
             ball.Restart();
@@ -52,6 +72,18 @@ public class GameController : MonoBehaviour
             sliderMagnus.value = 0.5f;
             effectForce = 0;
             textMagnus.text = "EFFECT FORCE: " + effectForce;
+            robot1.SetBool("Restart", true);
+            robot2.SetBool("Restart", true);
+            robot3.SetBool("Restart", true);
+            robot4.SetBool("Restart", true);
+            robot1.SetBool("Goal", false);
+            robot2.SetBool("Goal", false);
+            robot3.SetBool("Goal", false);
+            robot4.SetBool("Goal", false);
+            robot1.SetBool("Miss", false);
+            robot2.SetBool("Miss", false);
+            robot3.SetBool("Miss", false);
+            robot4.SetBool("Miss", false);
         }
 
         if (ball.adjustShot)
@@ -141,5 +173,20 @@ public class GameController : MonoBehaviour
         ball.shoot = !scorpion.GetComponent<IK_Scorpion>().animPlaying;
 
         if(ball.impact) ball.SetShotDirection();
+
+        if(ball.goal)
+        {
+            robot1.SetBool("Goal", true);
+            robot2.SetBool("Goal", true);
+            robot3.SetBool("Goal", true);
+            robot4.SetBool("Goal", true);
+        }
+        else if(ball.miss)
+        {
+            robot1.SetBool("Miss", true);
+            robot2.SetBool("Miss", true);
+            robot3.SetBool("Miss", true);
+            robot4.SetBool("Miss", true);
+        }
     }
 }
