@@ -160,8 +160,8 @@ public class GameController : MonoBehaviour
                 float angle = Mathf.Acos(value);
                 float y = -Mathf.Sin(angle);
                 ball.magnusForce = new Vector3((sliderMagnus.value - 0.5f) * 2, 0, y).normalized;
-                Vector3 aux = new Vector3(ball.arrow.forward.x, ball.arrow.forward.y, 0);
-                ball.impactPoint = -aux * 0.25f - ball.magnusForce * 0.25f;
+                /*Vector3 aux = new Vector3(ball.arrow.forward.x, ball.arrow.forward.y, 0);*/
+                ball.impactPoint = /*-aux * 0.25f*/ - ball.magnusForce * 0.25f;
                 ball.transform.GetChild(3).transform.position = ball.transform.position + ball.impactPoint;
             }
         }
